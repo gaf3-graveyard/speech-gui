@@ -1,3 +1,4 @@
+MACHINE=$(shell uname -m)
 ACCOUNT=nandyio
 IMAGE=speech-gui
 VERSION=0.1
