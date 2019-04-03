@@ -41,15 +41,12 @@ else
 endif
 
 install:
-	kubectl create -f kubernetes/account.yaml
 	kubectl create -f kubernetes/daemon.yaml
 
 update:
-	kubectl replace -f kubernetes/account.yaml
 	kubectl replace -f kubernetes/daemon.yaml
 
 remove:
 	kubectl delete -f kubernetes/daemon.yaml
-	kubectl delete -f kubernetes/account.yaml
 
 reset: remove install
