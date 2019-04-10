@@ -41,7 +41,7 @@ metadata:
 spec:
   selector:
     app: gui
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - name: http
     protocol: TCP
