@@ -3,7 +3,7 @@ ACCOUNT=nandyio
 IMAGE=speech-gui
 VERSION=0.1
 NAME=$(IMAGE)-$(ACCOUNT)
-NETWORK=klot-io
+NETWORK=klot.io
 VOLUMES=-v ${PWD}/www/:/opt/nandy-io/www/ \
 		-v ${PWD}/etc/docker.conf:/etc/nginx/conf.d/default.conf
 PORT=8371
