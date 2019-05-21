@@ -2,7 +2,8 @@ MACHINE=$(shell uname -m)
 ACCOUNT=nandyio
 IMAGE=speech-gui
 VERSION=0.1
-ACCOUNT=nandyio
+NAME=$(IMAGE)-$(ACCOUNT)
+NETWORK=klot-io
 VOLUMES=-v ${PWD}/www/:/opt/nandy-io/www/ \
 		-v ${PWD}/etc/docker.conf:/etc/nginx/conf.d/default.conf
 PORT=8371
@@ -13,7 +14,7 @@ else
 BASE=nginx:1.15.7-alpine
 endif
 
-.PHONY: cross build shell run push create update delete create-dev update-dev delete-dev
+.PHONY: cross build network shell run start stop push install update remove reset
 
 cross:
 	docker run --rm --privileged multiarch/qemu-user-static:register --reset
@@ -21,17 +22,20 @@ cross:
 build:
 	docker build . --build-arg BASE=$(BASE) -t $(ACCOUNT)/$(IMAGE):$(VERSION)
 
-shell:
-	docker run -it $(VOLUMES) $(ACCOUNT)/$(IMAGE):$(VERSION) sh
+network:
+	-docker network create $(NETWORK)
 
-run:
-	docker run --rm $(VARIABLES) $(VOLUMES) -p 127.0.0.1:$(PORT):80 -h $(IMAGE) $(ACCOUNT)/$(IMAGE):$(VERSION)
+shell: network
+	-docker run -it --rm --name=$(NAME) --network=$(NETWORK) $(VOLUMES) $(ENVIRONMENT) $(ACCOUNT)/$(IMAGE):$(VERSION) sh
 
-start:
-	docker run -d --name $(ACCOUNT)-$(IMAGE)-$(VERSION) $(VARIABLES) $(VOLUMES) -p 127.0.0.1:$(PORT):80 -h $(IMAGE) $(ACCOUNT)/$(IMAGE):$(VERSION)
+run: network
+	docker run --rm --name=$(NAME) --network=$(NETWORK) $(VOLUMES) $(ENVIRONMENT) -p 127.0.0.1:$(PORT):80 --expose=80 $(ACCOUNT)/$(IMAGE):$(VERSION)
+
+start: network
+	docker run -d --name=$(NAME) --network=$(NETWORK) $(VOLUMES) $(ENVIRONMENT) -p 127.0.0.1:$(PORT):80 --expose=80 $(ACCOUNT)/$(IMAGE):$(VERSION)
 
 stop:
-	docker rm -f $(ACCOUNT)-$(IMAGE)-$(VERSION)
+	docker rm -f $(NAME)
 
 push:
 ifeq ($(MACHINE),armv7l)
