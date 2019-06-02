@@ -14,7 +14,7 @@ else
 BASE=nginx:1.15.7-alpine
 endif
 
-.PHONY: cross build network shell run start stop push install update remove reset
+.PHONY: cross build network shell run start stop push install update remove reset tag
 
 cross:
 	docker run --rm --privileged multiarch/qemu-user-static:register --reset
@@ -45,12 +45,16 @@ else
 endif
 
 install:
-	kubectl create -f kubernetes/daemon.yaml
+	kubectl create -f kubernetes/gui.yaml
 
 update:
-	kubectl replace -f kubernetes/daemon.yaml
+	kubectl replace -f kubernetes/gui.yaml
 
 remove:
-	-kubectl delete -f kubernetes/daemon.yaml
+	-kubectl delete -f kubernetes/gui.yaml
 
 reset: remove install
+
+tag:
+	-git tag -a "v$(VERSION)" -m "Version $(VERSION)"
+	git push origin --tags
